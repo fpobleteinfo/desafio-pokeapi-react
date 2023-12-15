@@ -2,7 +2,8 @@ import { createContext, useState, useEffect } from "react";
 export const ApiContext = createContext();
 
 const ApiProvider = ({ children }) => {
-const [data, setData] = useState([]);
+const [data, setData] = useState([])
+const [selectData, setselectData] = useState('') // ?
 
 const url = "https://pokeapi.co/api/v2/pokemon?limit=251&offset=0"
 
@@ -26,7 +27,7 @@ useEffect(() => {
 
     return ( 
 
-    <ApiContext.Provider value={{ data, setData }}>
+    <ApiContext.Provider value={{ data, selectData,setselectData }}>
       {children}
     </ApiContext.Provider>
   );

@@ -1,33 +1,31 @@
-import React, { useContext, useState } from "react";
-import { ApiContext } from "../context/ApiContext";
+import React, { useContext } from "react";
 import Form from "react-bootstrap/Form";
 import Button from "react-bootstrap/Button";
+import { ApiContext } from "../context/ApiContext";
 import { useNavigate } from "react-router-dom";
 
 const SelectPokemon = () => {
-  const { data } = useContext(ApiContext)
-  const [name, setName] = useState("")
-  const navigate = useNavigate("")
-  
-  const irAPokemon = () =>{
-    //console.log(name);
-    navigate(`/pokemon/${name}`)
+  const { data, selectData, setselectData } = useContext(ApiContext);
+  const navigate = useNavigate();
 
-  }
+  const irAPokemon = () => {
+    navigate(`/pokemon/${selectData}`);
+  };
 
   return (
     <>
       <Form.Group className="mb-3">
-        <Form.Select>
+        <Form.Select
+          value={selectData}
+          onChange={({ target }) => setselectData(target.value)}
+        >
           <option>Abre aquí para ver los Pokémon...</option>
-          {data.map((c, index) => (
-            <option key={index} value={name} onChange={({ target }) => setName(target.value)}>
-              {c.name}
-            </option>
+          {data.map((c) => (
+            <option key={c.name}>{c.name}</option>
           ))}
         </Form.Select>
       </Form.Group>
-       <Button variant="dark" type="submit" onClick={irAPokemon()} > 
+      <Button variant="dark" type="submit" onClick={irAPokemon}>
         Ver Info
       </Button>
     </>
