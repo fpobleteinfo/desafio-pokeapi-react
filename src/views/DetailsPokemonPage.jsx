@@ -1,62 +1,97 @@
-import React, { useState, useEffect } from 'react'
-import { useParams } from 'react-router-dom'
-import Card from 'react-bootstrap/Card';
-import ListGroup from 'react-bootstrap/ListGroup';
+import React, { useState, useEffect } from "react";
+import { useParams } from "react-router-dom";
+import Card from "react-bootstrap/Card";
+import ListGroup from "react-bootstrap/ListGroup";
+import Tags from "../components/Tags";
+import Badge from "react-bootstrap/Badge";
 
 const DetailsPokemonPage = () => {
+  const { name } = useParams();
+  const [dataPoke, setDataPoke] = useState([]);
+  const [dataImgPoke, setImgDataPoke] = useState({});
+  //const [dataIdPoke, setIdPoke] = useState("");
+  
+  const url = `https://pokeapi.co/api/v2/pokemon/${name}`;
 
-const { name } = useParams()
-const [dataPoke, setDataPoke] = useState([])
+  const apiPokeDetail = async () => {
+    try {
+      const response = await fetch(url);
+      if (!response.ok) {
+        throw new Error("Ha habido un error en la API");
+      }
+      const info = await response.json();
+      setDataPoke(info.stats)
+      //setIdPoke(info.id)
+      setImgDataPoke(info.sprites.other.dream_world)
 
-const url = `https://pokeapi.co/api/v2/pokemon/${name}`;
 
 
-const apiPokeDetail = async () => {
-  try {
-    const response = await fetch(url);
-    if (!response.ok) {
-      throw new Error("Ha habido un error en la API");
+    } catch (error) {
+      console.error({ message: error });
     }
-    const info = await response.json();
-    setDataPoke(info.stats);
+  };
 
-    console.log(info.stats)
+  useEffect(() => {
+    apiPokeDetail();
+  }, [name]);
 
-  } catch (error) {
-    console.error({ message: error });
-  }
-};
-
-useEffect(() => {
-  apiPokeDetail();
-}, []);
-
+  const obtenerColorTag = (stat) => {
+    switch (stat) {
+      case "hp":
+        return "success";
+      case "attack":
+        return "danger";
+      case "defense":
+        return "primary";
+      case "special-attack":
+        return "warning";
+      case "special-defense":
+        return "info";
+      case "speed":
+        return "secondary";
+      default:
+        return "secondary";
+    }
+  };
 
   return (
     <>
-    <div className='container'>
-    <Card style={{ width: '18rem' }}>
-      <Card.Img variant="top" src="holder.js/100px180?text=Image cap" />
-      <Card.Body>
-        <Card.Title>{name}</Card.Title>
-        <Card.Text>
-          Some quick example text to build on the card title and make up the
-          bulk of the card's content.
-        </Card.Text>
-      </Card.Body>
-      
-      <ListGroup className="list-group-flush">
-      {dataPoke.map((stat, index) => (
-        <ListGroup.Item key={index}>
-          El stat '{stat.stat.name}' tiene un valor de base_stat de {stat.base_stat}.
-        </ListGroup.Item>
-      ))}
-      </ListGroup>
+      <div className="container-poke">
+        <Card style={{ width: "18rem" }} className="poke-card">
+          <Card.Img variant="top" src={dataImgPoke.front_default} className="svg-poke" />
+          <Card.Body>
+            <Card.Title>{name}
+            {/* <Badge bg="danger">
+            #{dataIdPoke}
+              </Badge>             */}
+            </Card.Title>
+          </Card.Body>
 
-    </Card>
-    </div>
+          <ListGroup as="ol">
+          {dataPoke.map((stat, index) => (
+            <ListGroup.Item
+              as="li"
+              className="d-flex justify-content-between align-items-start"
+              key={index}
+            >
+              <div className="ms-2 me-auto">
+                <div className="fw-bold">
+                <Tags
+                  colorTag={obtenerColorTag(stat.stat.name)}
+                  stat={stat.stat.name}
+                />                  
+                </div>
+              </div>
+              <Badge bg="dark" pill>
+              {stat.base_stat}
+              </Badge>
+            </ListGroup.Item>
+             ))}
+          </ListGroup>
+        </Card>
+      </div>
     </>
-  )
-}
+  );
+};
 
-export default DetailsPokemonPage
+export default DetailsPokemonPage;
